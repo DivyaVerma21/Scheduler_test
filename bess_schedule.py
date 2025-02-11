@@ -3,7 +3,6 @@ import pandas as pd
 import requests
 import plotly.express as px
 from datetime import datetime, timedelta, timezone
-import logging
 
 
 def fetch_day_prices(date):
@@ -24,12 +23,27 @@ def fetch_day_prices(date):
         raise Exception(f"Failed to retrieve data for {date}. Status code: {response.status_code}")
 
 
-
 # Function to generate BESS schedule
 def create_bess_schedule(prices_df):
-    charge_schedule = prices_df[prices_df['NOK_per_kWh'] <= prices_df['NOK_per_kWh'].quantile(0.3)]
-    discharge_schedule = prices_df[prices_df['NOK_per_kWh'] >= prices_df['NOK_per_kWh'].quantile(0.7)]
-    return charge_schedule, discharge_schedule
+    # Sort prices to get lowest and highest prices
+    lowest_prices = prices_df.nsmallest(3, 'NOK_per_kWh')  # Get the 3 lowest prices
+    highest_prices = prices_df.nlargest(3, 'NOK_per_kWh')  # Get the 3 highest prices
+
+    # Create charge, discharge, and idle schedules
+    prices_df['status'] = 'Idle'  # Default all as idle
+
+    # Mark charge for lowest 3 prices
+    prices_df.loc[prices_df['datetime'].isin(lowest_prices['datetime']), 'status'] = 'Charge'
+
+    # Mark discharge for highest 3 prices
+    prices_df.loc[prices_df['datetime'].isin(highest_prices['datetime']), 'status'] = 'Discharge'
+
+    # Separate charge and discharge schedules
+    charge_schedule = prices_df[prices_df['status'] == 'Charge']
+    discharge_schedule = prices_df[prices_df['status'] == 'Discharge']
+    idle_schedule = prices_df[prices_df['status'] == 'Idle']
+
+    return charge_schedule, discharge_schedule, idle_schedule
 
 
 def generate_schedule_with_next_day(selected_date):
@@ -40,14 +54,14 @@ def generate_schedule_with_next_day(selected_date):
         return None, None, None, None  # Ensure four return values
 
     # First schedule: 00:00 - 23:59 on selected day
-    charge_schedule, discharge_schedule = create_bess_schedule(selected_day_prices)
+    charge_schedule, discharge_schedule, idle_schedule = create_bess_schedule(selected_day_prices)
 
     # Second schedule: 13:00 - 23:59 on selected day + 00:00 - 23:59 next day
     extended_prices = pd.concat([selected_day_prices[selected_day_prices['hour'] >= 13], next_day_prices])
-    extended_charge_schedule, extended_discharge_schedule = create_bess_schedule(extended_prices)
+    extended_charge_schedule, extended_discharge_schedule, extended_idle_schedule = create_bess_schedule(extended_prices)
 
-    return (charge_schedule, discharge_schedule), (
-    extended_charge_schedule, extended_discharge_schedule), selected_day_prices, extended_prices
+    return (charge_schedule, discharge_schedule, idle_schedule), (
+        extended_charge_schedule, extended_discharge_schedule, extended_idle_schedule), selected_day_prices, extended_prices
 
 
 # Streamlit app
@@ -69,11 +83,13 @@ def main():
             st.write("⚠ No spot price data found. Try another date.")
         else:
             st.write(f"### BESS Schedule for {selected_date} (Full Day)")
-            df_first_schedule = pd.concat([first_schedule[0], first_schedule[1]])
+            df_first_schedule = pd.concat([first_schedule[0], first_schedule[1], first_schedule[2]])
+            df_first_schedule = df_first_schedule.sort_values(by='datetime')
             st.dataframe(df_first_schedule)
 
             st.write(f"### BESS Schedule for {selected_date} (13:00 to 23:59 + Full Next Day)")
-            df_second_schedule = pd.concat([second_schedule[0], second_schedule[1]])
+            df_second_schedule = pd.concat([second_schedule[0], second_schedule[1], second_schedule[2]])
+            df_second_schedule = df_second_schedule.sort_values(by='datetime')
             st.dataframe(df_second_schedule)
 
             if extended_prices is not None:
