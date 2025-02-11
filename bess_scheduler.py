@@ -84,10 +84,12 @@ def main():
         else:
             st.write(f"### BESS Schedule for {selected_date} (Full Day)")
             df_first_schedule = pd.concat([first_schedule[0], first_schedule[1], first_schedule[2]])
+            df_first_schedule = df_first_schedule.sort_values(by='datetime')
             st.dataframe(df_first_schedule)
 
             st.write(f"### BESS Schedule for {selected_date} (13:00 to 23:59 + Full Next Day)")
             df_second_schedule = pd.concat([second_schedule[0], second_schedule[1], second_schedule[2]])
+            df_second_schedule = df_second_schedule.sort_values(by='datetime')
             st.dataframe(df_second_schedule)
 
             if extended_prices is not None:
