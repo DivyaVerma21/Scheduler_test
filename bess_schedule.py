@@ -109,7 +109,7 @@ def main():
                 st.plotly_chart(fig2)
 
             cost_savings = calculate_cost_savings(first_schedule.copy(), extended_schedule.copy(), charge_rate, discharge_rate)
-            st.write(f"Cost Savings with strategic change in schedule : {cost_savings:.2f} NOK")
+            st.write(f"Cost Savings on {selected_date} during 13:00 to 24:00 with strategic change in schedule : {cost_savings:.2f} NOK")
 
 
 if __name__ == "__main__":
