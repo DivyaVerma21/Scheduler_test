@@ -20,6 +20,10 @@
       <change afterPath="$PROJECT_DIR$/../pythonProject/.idea/misc.xml" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/../pythonProject/.idea/modules.xml" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/../pythonProject/.idea/pythonProject.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bess_schedule.py" beforeDir="false" afterPath="$PROJECT_DIR$/bess_schedule.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bess_scheduler.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,7 +48,7 @@
     "Python.bess_scheduler.executor": "Run",
     "Python.main.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "with__docker"
+    "git-widget-placeholder": "main"
   },
   "keyToStringList": {
     "stardust.markdown.MarkdownSplitEditorSuppressor:keyList": []
