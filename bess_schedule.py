@@ -79,7 +79,7 @@ def calculate_schedule_cost(schedule, charge_rate, discharge_rate):
 def main():
     st.title("BESS Schedule Generator and Cost Savings Calculator")
     today = datetime.now(timezone.utc).date()
-    selected_date = st.date_input("Select a date", min_value=datetime(2024, 1, 1).date(), max_value=today)
+    selected_date = st.date_input("Please select a date. Today's date is not recommended before 14:00", min_value=datetime(2024, 1, 1).date(), max_value=today)
 
     charge_rate = st.number_input("Enter Charge Rate (kWh):", min_value=0.1, value=1.0)
     discharge_rate = st.number_input("Enter Discharge Rate (kWh):", min_value=0.1, value=1.0)
